@@ -62,3 +62,65 @@
                      (if (= len 1)
                          (car e)
                          (list len (car e))))) packed)))
+
+(defun mklst (size e)
+  (when (> size 0)
+    (cons e (mklst (1- size) e))))
+
+(defun decode (lst)
+  (when (consp lst)
+    (let ((fst (car lst)))
+      (if (listp fst)
+          (append (mklst (car fst) (second fst))
+                  (decode (cdr lst)))
+          (cons fst (decode (cdr lst)))))))
+
+(defun encode-d (lst &optional (count 1))
+  (when (consp lst)
+    (cond
+      ((equal (car lst) (second lst)) (encode-d (cdr lst) (1+ count)))
+      ((= 1 count) (cons (car lst) (encode-d (cdr lst))))
+      (t (cons (cons count (car lst)) (encode-d (cdr lst)))))))
+
+(defun dupli (lst)
+  (when (consp lst)
+    (cons (car lst) (cons (car lst) (dupli (cdr lst))))))
+
+(defun repli (lst times)
+  (when (consp lst)
+    (append (mklst times (car lst)) (repli (cdr lst) times))))
+
+(defun drop (lst n &optional (counter n))
+  (when (consp lst)
+    (if (= 1 counter)
+        (drop (cdr lst) n)
+        (cons (car lst) (drop (cdr lst) n (1- counter))))))
+
+(defun split (lst size)
+  (when (consp lst)
+    (if (= 1 size)
+        (list (list (car lst)) (cdr lst))
+        (let ((next (split (cdr lst) (1- size))))
+          (cons (cons (car lst) (car next))
+                (cdr next))))))
+
+(defun slice (lst n m)
+  (when (consp lst)
+    (cond
+      ((= 0 m) nil)
+      ((= 1 n) (cons (car lst) (slice (cdr lst) n (1- m))))
+      (t (slice (cdr lst) (1- n) (1- m))))))
+
+(defun rotate (lst n)
+  (when (consp lst)
+    (let* ((len (length lst))
+           (spl (if (> n 0)
+                    (split lst n)
+                    (split lst (+ len n)))))
+      (append (second spl) (car spl)))))
+
+(defun remove-at (lst n)
+  (when (consp lst)
+    (if (<= 1 n)
+        (cdr lst)
+        (cons (car lst) (remove-at (cdr lst) (1- n))))))
