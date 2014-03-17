@@ -121,6 +121,35 @@
 
 (defun remove-at (lst n)
   (when (consp lst)
-    (if (<= 1 n)
+    (if (>= 1 n)
         (cdr lst)
         (cons (car lst) (remove-at (cdr lst) (1- n))))))
+
+(defun insert-at (e lst n)
+  (when (consp lst)
+    (if (= n 1)
+        (cons e lst)
+        (cons (car lst) (insert-at e (cdr lst) (1- n))))))
+
+(defun range (a b)
+  (cond 
+    ((= a b) (cons a nil))
+    ((> a b) (cons a (range (1- a) b)))
+    (t (cons a (range (1+ a) b)))))
+
+(defun rnd-select (lst n)
+  (if (zerop n)
+      nil
+      (let ((pos (1+ (random (length lst)))))
+        (cons (element-at lst pos)
+              (rnd-select (remove-at lst pos) (1- n))))))
+
+(defun lotto-select (n max)
+  (rnd-select (range 1 max) n))
+
+(defun rnd-permu (lst)
+  (rnd-select lst (length lst)))
+
+(defun combination (n lst &optional fixed)
+  (when (consp lst)
+    ()))
